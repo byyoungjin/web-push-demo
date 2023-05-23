@@ -1,22 +1,23 @@
 const webPush = require('web-push');
 
-webPush.setGCMAPIKey(process.env.GCM_API_KEY);
-const vapidKeys = webPush.generateVAPIDKeys();
-webPush.setVapidDetails(
-  `mailto:${process.env.WEB_PUSH_EMAIL}`,
-  process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY,
-  process.env.WEB_PUSH_PRIVATE_KEY
-);
-console.log('vapidKeys', vapidKeys);
-//   `mailto:${process.env.WEB_PUSH_EMAIL}`,
-//   process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY,
-//   process.env.WEB_PUSH_PRIVATE_KEY
-// )
-
 const Notification = (req, res) => {
   if (req.method == 'POST') {
     const { subscription } = req.body;
 
+    // const options = {
+    //   gcmAPIKey: process.env.GCM_API_KEY,
+    //   vapidDetails: {
+    //     subject: `mailto:${process.env.WEB_PUSH_EMAIL}`,
+    //     publicKey: process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY,
+    //     privateKey: process.env.WEB_PUSH_PRIVATE_KEY,
+    //   },
+    // };
+    webPush.setGCMAPIKey(process.env.GCM_API_KEY);
+    webPush.setVapidDetails(
+      `mailto:${process.env.WEB_PUSH_EMAIL}`,
+      process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY,
+      process.env.WEB_PUSH_PRIVATE_KEY
+    );
     webPush
       .sendNotification(
         subscription,
@@ -24,8 +25,10 @@ const Notification = (req, res) => {
           title: 'Hello Web Push',
           message: 'Your web push notification is here!',
         })
+        // options
       )
       .then((response) => {
+        console.log('sended');
         res.writeHead(response.statusCode, response.headers).end(response.body);
       })
       .catch((err) => {
